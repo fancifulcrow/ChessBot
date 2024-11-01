@@ -104,6 +104,7 @@ def get_position_value(piece: chess.Piece, square: chess.Square, is_endgame: boo
     return table[index]
 
 
+# Check if endgame
 def is_endgame(board: chess.Board) -> bool:
     queens = len(board.pieces(chess.QUEEN, chess.WHITE)) + len(board.pieces(chess.QUEEN, chess.BLACK))
     minor_pieces = (
@@ -115,13 +116,14 @@ def is_endgame(board: chess.Board) -> bool:
     return queens == 0 or (queens == 2 and minor_pieces <= 2)
 
 
-# Minimax algorithm with alpha-beta pruning and transposition table
-def minimax(board: chess.Board, depth: int, alpha: float, beta: float, is_maximizing: bool, transposition_table: dict) -> tuple[float, chess.Move | None]:
-    position_hash = board.fen()
-    if position_hash in transposition_table:
-        stored_value, stored_depth, stored_move = transposition_table[position_hash]
-        if stored_depth == depth and stored_value != math.inf and stored_value != -math.inf:
-            return stored_value, stored_move
+# Minimax algorithm with alpha-beta pruning, transposition table
+def minimax(board: chess.Board, depth: int, alpha: float, beta: float, is_maximizing: bool, transposition_table: dict | None = None) -> tuple[float, chess.Move | None]:
+    if transposition_table:
+        position_hash = board.fen()
+        if position_hash in transposition_table:
+            stored_value, stored_depth, stored_move = transposition_table[position_hash]
+            if stored_depth == depth:
+                return stored_value, stored_move
     
     if depth == 0 or board.is_game_over():
         return evaluation(board), None
@@ -161,32 +163,36 @@ def minimax(board: chess.Board, depth: int, alpha: float, beta: float, is_maximi
         if beta <= alpha:
             break
 
-    transposition_table[position_hash] = (best_value, depth, best_move)
+    if transposition_table:
+        transposition_table[position_hash] = (best_value, depth, best_move)
 
     return best_value, best_move
 
 
+# Simple Evaluation Function
 def evaluation(board: chess.Board) -> float:
     if board.is_checkmate():
-        return -2000000 if board.turn == chess.WHITE else 2000000
+        return -2147483648 if board.turn == chess.WHITE else 2147483647
     
     if board.is_stalemate() or board.is_insufficient_material():
         return 0
     
     score = 0
 
-    score += evaluate_position(board, is_endgame(board))
+    score += evaluate_position(board)
     score += evaluate_material(board)
 
     return score
-    
 
-def evaluate_position(board: chess.Board, is_endgame: bool) -> int:
+
+def evaluate_position(board: chess.Board) -> int:
     score = 0
+    endgame = is_endgame(board)
+
     for square in chess.SQUARES:
         piece = board.piece_at(square)
         if piece is not None:
-            value = get_position_value(piece, square, is_endgame)
+            value = get_position_value(piece, square, endgame)
             score += value if piece.color == chess.WHITE else -value
     return score
 
