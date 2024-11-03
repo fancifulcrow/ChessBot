@@ -1,10 +1,11 @@
 import chess
 import math
-from .utils import get_position_value, piece_values, is_endgame
+
+from .utils import get_position_value, piece_values, is_endgame, board_to_rep
 
 
 # Minimax algorithm with alpha-beta pruning, transposition table
-def minimax(board: chess.Board, depth: int, alpha: float, beta: float, is_maximizing: bool, transposition_table: dict | None = None) -> tuple[float, chess.Move | None]:
+def minimax(board: chess.Board, depth: int, alpha: float, beta: float, is_maximizing: bool, model, transposition_table: dict | None = None) -> tuple[int, chess.Move | None]:
     if transposition_table:
         position_hash = board.fen()
         if position_hash in transposition_table:
@@ -13,7 +14,7 @@ def minimax(board: chess.Board, depth: int, alpha: float, beta: float, is_maximi
                 return stored_value, stored_move
     
     if board.is_game_over() or depth == 0:
-        return evaluation(board), None
+        return evaluation(board, model), None
     
     best_value = -math.inf if is_maximizing else math.inf
     best_move = None
@@ -33,7 +34,7 @@ def minimax(board: chess.Board, depth: int, alpha: float, beta: float, is_maximi
 
     for move in moves:
         board.push(move)
-        value, _ = minimax(board, depth - 1, alpha, beta, not is_maximizing, transposition_table)
+        value, _ = minimax(board, depth - 1, alpha, beta, not is_maximizing, model, transposition_table)
         board.pop()
         
         if is_maximizing:
@@ -56,8 +57,20 @@ def minimax(board: chess.Board, depth: int, alpha: float, beta: float, is_maximi
     return best_value, best_move
 
 
-# Simple Evaluation Function
-def evaluation(board: chess.Board) -> float:
+def evaluation(board: chess.Board, model) -> int:
+    if board.is_checkmate():
+        return -2147483648 if board.turn == chess.WHITE else 2147483647
+    
+    if board.is_stalemate() or board.is_insufficient_material():
+        return 0
+
+    inputs = board_to_rep(board)
+
+    return model(inputs).item()
+
+
+# Simple Evaluation Function. This is the implementation of a basic handcrafted evaluation function
+def simple_evaluation(board: chess.Board) -> int:
     if board.is_checkmate():
         return -2147483648 if board.turn == chess.WHITE else 2147483647
     
@@ -78,7 +91,7 @@ def evaluate_position(board: chess.Board) -> int:
 
     for square in chess.SQUARES:
         piece = board.piece_at(square)
-        if piece is not None:
+        if piece:
             value = get_position_value(piece, square, endgame)
             score += value if piece.color == chess.WHITE else -value
     return score
@@ -93,4 +106,5 @@ def evaluate_material(board: chess.Board) -> int:
 
 
 def quiescence_search(board: chess.Board, depth: int, alpha: float, beta: float, is_maximizing: bool) -> float:
+    # Implement later. Maybe...
     ...
