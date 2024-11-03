@@ -1,5 +1,5 @@
 import chess
-from .src.minimax import minimax
+from .modules.minimax import minimax
 import math
 
 class ChessBot:
