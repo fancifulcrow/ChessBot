@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project introduces chess engine capable of evaluating positions and making decisions based on neural network insights. The bot is designed with two core components: **Search** and **Evaluation**. While initially leveraging classical techniques, the project explores the integration of a neural network to improve the evaluation process, inspired by **NNUE** (Efficiently Updated Neural Network). This NNUE implementation is simpler than the one used in Stockfish.
+This project introduces chess engine capable of evaluating positions and making decisions based on neural network insights. The bot is designed with two core components: **Search** and **Evaluation**. While initially leveraging classical techniques, the project explores the integration of a neural network to improve the evaluation process, inspired by **NNUE** (Efficiently Updatable Neural Network). This NNUE implementation is simpler than the one used in Stockfish.
 
 <p align="center">
   <img src="images/output.svg" alt="A Chessboard illustration">
@@ -21,7 +21,7 @@ To enhance performance, a **transposition table** is utilized. This table stores
 
 Initially, the bot used a hand-crafted evaluation function. This function combined piece-square tables, which capture positional values for pieces on specific squares, with the material values of each piece. While this traditional approach offered solid evaluations, it was later replaced with a neural network approach inspired by **NNUE** principles.
 
-The NNUE (Efficiently Updated Neural Network) approach is designed to provide a fast evaluation of board positions through a compact neural network architecture. NNUE must meet the following conditions:
+The NNUE (Efficiently Updatable Neural Network) approach is designed to provide a fast evaluation of board positions through a compact neural network architecture. NNUE must meet the following conditions:
 
 1. **Sparse Inputs**  
 The input vector must contain minimal non-zero elements. For our model, the input layer size is set to **768**. Each position on the board is represented by a tuple, **(piece_square, piece_type, piece_color)**, yielding 768 inputs (64 squares × 6 piece types × 2 colors). Given that a chessboard has at most 32 pieces, only a small portion of the input layer is active at any given time.
