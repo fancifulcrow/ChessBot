@@ -1,11 +1,12 @@
 import chess
 import math
+import torch
 
 from .utils import get_position_value, piece_values, is_endgame, board_to_rep
 
 
 # Minimax algorithm with alpha-beta pruning, transposition table
-def minimax(board: chess.Board, depth: int, alpha: float, beta: float, is_maximizing: bool, model, transposition_table: dict | None = None) -> tuple[int, chess.Move | None]:
+def minimax(board: chess.Board, depth: int, alpha: float, beta: float, is_maximizing: bool, model: torch.nn.Module, transposition_table: dict | None = None) -> tuple[float, chess.Move | None]:
     if transposition_table:
         position_hash = board.fen()
         if position_hash in transposition_table:
@@ -57,7 +58,7 @@ def minimax(board: chess.Board, depth: int, alpha: float, beta: float, is_maximi
     return best_value, best_move
 
 
-def evaluation(board: chess.Board, model) -> int:
+def evaluation(board: chess.Board, model: torch.nn.Module) -> float:
     if board.is_checkmate():
         return -2147483648 if board.turn == chess.WHITE else 2147483647
     
@@ -70,7 +71,7 @@ def evaluation(board: chess.Board, model) -> int:
 
 
 # Simple Evaluation Function. This is the implementation of a basic handcrafted evaluation function
-def simple_evaluation(board: chess.Board) -> int:
+def simple_evaluation(board: chess.Board) -> float:
     if board.is_checkmate():
         return -2147483648 if board.turn == chess.WHITE else 2147483647
     
@@ -85,7 +86,7 @@ def simple_evaluation(board: chess.Board) -> int:
     return score
 
 
-def evaluate_position(board: chess.Board) -> int:
+def evaluate_position(board: chess.Board) -> float:
     score = 0
     endgame = is_endgame(board)
 
@@ -97,7 +98,7 @@ def evaluate_position(board: chess.Board) -> int:
     return score
 
 
-def evaluate_material(board: chess.Board) -> int:
+def evaluate_material(board: chess.Board) -> float:
     score = 0
     for piece_type in piece_values:
         score += len(board.pieces(piece_type, chess.WHITE)) * piece_values[piece_type]

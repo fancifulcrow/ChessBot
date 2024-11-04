@@ -116,6 +116,7 @@ def is_endgame(board: chess.Board) -> bool:
     return queens == 0 or (queens == 2 and minor_pieces <= 2)
 
 
+# Convert from chess.Board to our representation
 def board_to_rep(board: chess.Board) -> torch.Tensor:
     piece_to_index = {
         'P': 0, 'N': 1, 'B': 2, 'R': 3, 'Q': 4, 'K': 5,  # White pieces
@@ -137,6 +138,7 @@ def board_to_rep(board: chess.Board) -> torch.Tensor:
     return features
 
 
+# Convert from FEN to our representation
 def fen_to_rep(fen: str) -> torch.Tensor:
     piece_to_index = {
         'P': 0, 'N': 1, 'B': 2, 'R': 3, 'Q': 4, 'K': 5,  # White pieces
@@ -144,7 +146,7 @@ def fen_to_rep(fen: str) -> torch.Tensor:
     }
 
     fen = fen.split()[0]
-    features = torch.zeros(768, dtype=torch.int16)
+    features = torch.zeros(768, dtype=torch.float32)
 
     # We are starting from A1 to H8. Similar to how it is done in the chess-python package. 
     # FEN on the other hand, starts from A8 to H1.
