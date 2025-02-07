@@ -1,12 +1,13 @@
 import chess
 import math
 import torch
+from typing import Dict, Tuple
 
 from .utils import get_position_value, piece_values, is_endgame, board_to_rep
 
 
 # Minimax algorithm with alpha-beta pruning, transposition table
-def minimax(board: chess.Board, depth: int, alpha: float, beta: float, is_maximizing: bool, model: torch.nn.Module, transposition_table: dict | None = None) -> tuple[float, chess.Move | None]:
+def minimax(board: chess.Board, depth: int, alpha: float, beta: float, is_maximizing: bool, model: torch.nn.Module, transposition_table: Dict | None = None) -> Tuple[float, chess.Move | None]:
     if transposition_table:
         position_hash = board.fen()
         if position_hash in transposition_table:

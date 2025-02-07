@@ -1,8 +1,10 @@
 import chess
 import torch
+import yaml
+from typing import Dict, List
 
 # Piece-square tables for chess pieces
-piece_square_tables: dict[chess.Piece, list[int]] = {
+piece_square_tables: Dict[chess.Piece, List[int]] = {
     chess.PAWN: [
          0,  0,  0,  0,  0,  0,  0,  0,
         50, 50, 50, 50, 50, 50, 50, 50,
@@ -82,7 +84,7 @@ KING_ENDGAME_TABLE = [
 ]
 
 # Material values of chess pieces
-piece_values: dict[chess.Piece, int] = {
+piece_values: Dict[chess.Piece, int] = {
     chess.PAWN: 100,
     chess.KNIGHT: 320,
     chess.BISHOP: 330,
@@ -91,6 +93,11 @@ piece_values: dict[chess.Piece, int] = {
     chess.KING: 20000
 }
 
+
+piece_to_index: Dict[str, int] = {
+    'P': 0, 'N': 1, 'B': 2, 'R': 3, 'Q': 4, 'K': 5,  # White pieces
+    'p': 6, 'n': 7, 'b': 8, 'r': 9, 'q': 10, 'k': 11  # Black pieces
+}
 
 # Get the position value for a piece on a given square.
 def get_position_value(piece: chess.Piece, square: chess.Square, is_endgame: bool) -> int:
@@ -118,11 +125,6 @@ def is_endgame(board: chess.Board) -> bool:
 
 # Convert from chess.Board to our representation
 def board_to_rep(board: chess.Board) -> torch.Tensor:
-    piece_to_index = {
-        'P': 0, 'N': 1, 'B': 2, 'R': 3, 'Q': 4, 'K': 5,  # White pieces
-        'p': 6, 'n': 7, 'b': 8, 'r': 9, 'q': 10, 'k': 11  # Black pieces
-    }
-
     features = torch.zeros(768, dtype=torch.float32)
     
     for square in chess.SQUARES:
@@ -140,11 +142,6 @@ def board_to_rep(board: chess.Board) -> torch.Tensor:
 
 # Convert from FEN to our representation
 def fen_to_rep(fen: str) -> torch.Tensor:
-    piece_to_index = {
-        'P': 0, 'N': 1, 'B': 2, 'R': 3, 'Q': 4, 'K': 5,  # White pieces
-        'p': 6, 'n': 7, 'b': 8, 'r': 9, 'q': 10, 'k': 11  # Black pieces
-    }
-
     fen = fen.split()[0]
     features = torch.zeros(768, dtype=torch.float32)
 
@@ -169,3 +166,10 @@ def fen_to_rep(fen: str) -> torch.Tensor:
             file += 1
 
     return features
+
+
+def load_config(config_path: str) -> Dict:
+    with open(config_path, mode="r") as f:
+        config = yaml.safe_load(f)
+
+    return config

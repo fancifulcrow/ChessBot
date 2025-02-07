@@ -3,6 +3,7 @@ from modules.minimax import minimax
 import math
 import torch
 
+
 class ChessBot:
     def __init__(self, max_depth: int, model: torch.nn.Module, transposition_table: dict | None = None) -> None:
         self.max_depth = max_depth

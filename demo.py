@@ -4,7 +4,7 @@ import torch
 from modules.nnue import NNUE
 from main import ChessBot
 
-model_path = "models/nnue_model.pth"
+model_path = "models/nnue_model_checkpoint.pth"
 
 if __name__ == "__main__":
     transposition_table = dict()
@@ -20,8 +20,9 @@ if __name__ == "__main__":
     # Create board and play
     board = chess.Board()
 
-    move = chessbot.search(board)
+    while not board.is_game_over():
+        move = chessbot.search(board)
 
-    board.push(move)
+        board.push(move)
 
-    print(board)
+        print(board)

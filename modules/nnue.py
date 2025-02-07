@@ -3,6 +3,7 @@ import torch.nn as nn
 from torch.utils.data import Dataset
 import pandas as pd
 import os
+from typing import Tuple
 
 from .utils import fen_to_rep
 
@@ -30,7 +31,7 @@ class NNUE(nn.Module):
 
 
 class ChessDataset(Dataset):
-    def __init__(self, folder_path, chunk_size=10000):
+    def __init__(self, folder_path, chunk_size=10000) -> None:
         self.folder_path = folder_path
         self.data_files = [os.path.join(folder_path, file_name) 
                            for file_name in os.listdir(folder_path) if file_name.endswith('.csv')]
@@ -42,7 +43,7 @@ class ChessDataset(Dataset):
         self.length = sum(sum(1 for _ in pd.read_csv(file, chunksize=self.chunk_size)) for file in self.data_files) * self.chunk_size
 
     # the dataset was too large for memory
-    def _load_chunk(self):
+    def _load_chunk(self) -> None:
         if self.current_file_index >= len(self.data_files):
             raise IndexError("No more data available.")
 
@@ -58,10 +59,10 @@ class ChessDataset(Dataset):
                 self.current_chunk = None
                 self._load_chunk()
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self.length
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx) -> Tuple[torch.Tensor, torch.Tensor]:
         self._load_chunk()
 
         if idx >= len(self.current_chunk):
