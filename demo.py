@@ -2,11 +2,13 @@ import chess
 import torch
 
 from modules.nnue import NNUE
-from main import ChessBot
+from chessbot import ChessBot
+
 
 model_path = "models/nnue_model_checkpoint.pth"
 
-if __name__ == "__main__":
+
+def main() -> None:
     transposition_table = dict()
 
     # Load the model
@@ -26,3 +28,9 @@ if __name__ == "__main__":
         board.push(move)
 
         print(board)
+
+    print(board.result())
+
+
+if __name__ == "__main__":
+    main()
