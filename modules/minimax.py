@@ -3,7 +3,7 @@ import math
 import torch
 from typing import Dict, Tuple
 
-from .utils import get_position_value, piece_values, is_endgame, board_to_rep
+from .utils import board_to_rep
 
 
 # Minimax algorithm with alpha-beta pruning, transposition table
@@ -69,42 +69,6 @@ def evaluation(board: chess.Board, model: torch.nn.Module) -> float:
     inputs = board_to_rep(board)
 
     return model(inputs).item()
-
-
-# Simple Evaluation Function. This is the implementation of a basic handcrafted evaluation function
-def simple_evaluation(board: chess.Board) -> float:
-    if board.is_checkmate():
-        return -2147483648 if board.turn == chess.WHITE else 2147483647
-    
-    if board.is_stalemate() or board.is_insufficient_material():
-        return 0
-    
-    score = 0
-
-    score += evaluate_position(board)
-    score += evaluate_material(board)
-
-    return score
-
-
-def evaluate_position(board: chess.Board) -> float:
-    score = 0
-    endgame = is_endgame(board)
-
-    for square in chess.SQUARES:
-        piece = board.piece_at(square)
-        if piece:
-            value = get_position_value(piece, square, endgame)
-            score += value if piece.color == chess.WHITE else -value
-    return score
-
-
-def evaluate_material(board: chess.Board) -> float:
-    score = 0
-    for piece_type in piece_values:
-        score += len(board.pieces(piece_type, chess.WHITE)) * piece_values[piece_type]
-        score -= len(board.pieces(piece_type, chess.BLACK)) * piece_values[piece_type]
-    return score
 
 
 def quiescence_search(board: chess.Board, depth: int, alpha: float, beta: float, is_maximizing: bool) -> float:
