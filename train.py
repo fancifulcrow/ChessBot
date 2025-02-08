@@ -10,8 +10,8 @@ from modules.utils import load_config
 
 
 def train(model: torch.nn.Module, optimizer, train_loader: torch.utils.data.DataLoader, num_epochs: int, device: str) -> List[float]:
-    criterion = nn.MSELoss()
-
+    criterion = nn.L1Loss()
+    
     for epoch in range(num_epochs):
         model.train()
         running_loss = 0.0
@@ -41,7 +41,7 @@ def train(model: torch.nn.Module, optimizer, train_loader: torch.utils.data.Data
 
 
 def validate(model: torch.nn.Module, val_loader: torch.utils.data.DataLoader, device: str) -> float:
-    criterion = nn.MSELoss()
+    criterion = nn.L1Loss()
 
     model.eval()
     running_loss = 0.0
